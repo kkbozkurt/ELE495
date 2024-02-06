@@ -19,9 +19,9 @@ def loop():
     # Spin motor slowly
     for x in range(stepsPerRevolution):
         GPIO.output(stepPin, GPIO.HIGH)
-        time.sleep(0.002)
+        time.sleep(0.001)
         GPIO.output(stepPin, GPIO.LOW)
-        time.sleep(0.002)
+        time.sleep(0.001)
     # time.sleep(1) # Wait a second
 
     # Set motor direction counterclockwise
