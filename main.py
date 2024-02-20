@@ -6,12 +6,8 @@ from jetson_utils import videoSource, videoOutput, Log, saveImageRGBA
 from queue import Queue 
 from threading import * 
 
-GPIO.setmode(GPIO.BCM)
 
 def ultrasonic():
-    PIN_TRIGGER = 23
-    PIN_ECHO = 24
-    GPIO_step = 9
 
     GPIO.setup(PIN_TRIGGER, GPIO.OUT)
     GPIO.setup(PIN_ECHO, GPIO.IN)
@@ -40,16 +36,18 @@ def ultrasonic():
             print("Processing image...")
             event.clear()
             process_image()
+            for i in range(600):
+                GPIO.output(GPIO_step, GPIO.HIGH)
+                time.sleep(0.002)
+                GPIO.output(GPIO_step, GPIO.LOW)
+                time.sleep(0.002)
+                print("Steps count {}".format(i+1), end="\r", flush=True)
             event.set()
-            time.sleep(5)
 
         print ("Distance:",distance,"cm")
         time.sleep(0.05)
 
 def stepper():
-
-    GPIO_dir = 25
-    GPIO_step = 9
         
     GPIO.setup(GPIO_dir, GPIO.OUT) 
     GPIO.setup(GPIO_step, GPIO.OUT)
@@ -62,13 +60,8 @@ def stepper():
             time.sleep(0.002)
             GPIO.output(GPIO_step, GPIO.LOW)
             time.sleep(0.002)
-        time.sleep(5)
         # event.set()
 
-
-input = videoSource("/dev/video0")
-# load the object detection network
-net = detectNet("ssd-mobilenet-v2", 0.25)
 
 def process_image():
     while True:
@@ -94,17 +87,25 @@ def process_image():
 
         # render the image
         output.Render(img)
+        print("Looptan çıkıldı")
         break
-        # update the title bar
         # output.SetStatus("{:s} | Network {:.0f} FPS".format("ssd-mobilenet-v2", net.GetNetworkFPS()))
 
-        # exit on when output and detections are created
+GPIO.setmode(GPIO.BCM)
+
+PIN_TRIGGER = 23
+PIN_ECHO = 24
+
+GPIO_dir = 25
+GPIO_step = 9
+
+input = videoSource("/dev/video0")
+# load the object detection network
+net = detectNet("ssd-mobilenet-v2", 0.25)
 
 event = Event()
 t1 = Thread(target=ultrasonic)
 t2 = Thread(target=stepper)
-t3 = Thread(target=process_image)
 
 t1.start() 
 t2.start() 
-#t3.start()
