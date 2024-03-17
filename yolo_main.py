@@ -6,17 +6,17 @@ import cv2
 import Jetson.GPIO as GPIO
 import requests
 from queue import Queue 
-from threading import * 
+from threading import Thread, Event
 
 
-def api_messaging():
-        message_to_send = {
+def api_messaging(message_to_send):
+        message = {
         "apiKey": '7baabcd4-1741-4c91-a5c1-9898b7af75eb',
-        "message": "Metal Olmayan Çöp Tespit Edildi!, Yeşil Noktaya Götürülüyor.",
+        "message": message_to_send,
         "description": "Başarılı",
         "type": "info",  #info, error, warning or success
         }
-        requests.post('https://api.mynotifier.app', message_to_send)
+        requests.post('https://api.mynotifier.app', message)
 
 def ultrasonic():
 
@@ -77,23 +77,41 @@ def stepper():
 def process_image():
     cam = cv2.VideoCapture("/dev/video0") 
     result, image = cam.read() 
-    path = os.getcwd() + "/camera/output/"
-    if not os.path.exists(path):
-        os.mkdir(path)
-    path_output = path + str(time.time()) + ".jpg"
-    # path_output = path + "deneme" + ".jpg"
     # capture the next image
     results = model.predict(image, show_labels=True, show_conf=True, save_txt=True)
+    detected_objects_image = {"Unknown": 0}
     for result in results:
         for box in result.boxes:
             # boxes = result.boxes  # Boxes object for bounding box outputs
-            print(box.conf)
-            print(box.cls)
-        masks = result.masks  # Masks object for segmentation masks outputs
-        keypoints = result.keypoints  # Keypoints object for pose outputs
-        probs = result.probs  # Probs object for classification outputs
-        print(probs)
+            print(box.conf.item())
+            if box.conf.item() < 0.35:
+                detected_objects.update({"Unknown": detected_objects.get("Unknown") + 1})
+                detected_objects_image.update({"Unknown": detected_objects_image.get("Unknown") + 1})
+            else:
+                # Total Detected Object
+
+                if not detected_objects.get(model.names[box.cls.item()], False):
+                    detected_objects.update({model.names[box.cls.item()]: 1})
+                else:
+                    detected_objects.update({model.names[box.cls.item()]: detected_objects.get(model.names[box.cls.item()]) + 1})
+                # Objects Detected in Image
+                    
+                if not detected_objects_image.get(model.names[box.cls.item()], False):
+                    detected_objects_image.update({model.names[box.cls.item()]: 1})
+                else:
+                    detected_objects_image.update({model.names[box.cls.item()]: detected_objects_image.get(model.names[box.cls.item()]) + 1})
         result.save(filename='result.jpg')  # save to disk
+    # print(detected_objects)
+    # print(detected_objects_image)
+    message_to_send = ""
+    for i, (key, value) in enumerate(detected_objects_image.items()):
+        message_to_send += str(value) + " " + key + ", "
+    message_to_send += "detected! \nTotal "
+    for i, (key, value) in enumerate(detected_objects.items()):
+        message_to_send += str(value) + " " + key + ", "
+    message_to_send += "detected!\n"
+    print(message_to_send)
+    # api_messaging(message_to_send)
 
     
 GPIO.setmode(GPIO.BCM)
@@ -106,7 +124,9 @@ GPIO_step = 9
 
 step_time = 0.0030
 
-model = YOLO('yolov5n.pt')
+model = YOLO('yolov5su.pt')
+
+detected_objects = {"Unknown": 0}
 
 event = Event()
 t1 = Thread(target=ultrasonic)
