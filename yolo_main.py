@@ -62,7 +62,7 @@ def stepper():
         
     GPIO.setup(GPIO_dir, GPIO.OUT) 
     GPIO.setup(GPIO_step, GPIO.OUT)
-    GPIO.output(GPIO_dir, GPIO.LOW)
+    GPIO.output(GPIO_dir, GPIO.HIGH)
 
     while True:
         event.wait()
@@ -111,7 +111,7 @@ def process_image():
         message_to_send += str(value) + " " + key + ", "
     message_to_send += "detected!\n"
     print(message_to_send)
-    # api_messaging(message_to_send)
+    api_messaging(message_to_send)
 
     
 GPIO.setmode(GPIO.BCM)
