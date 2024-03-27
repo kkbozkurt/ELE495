@@ -7,7 +7,9 @@
 
 The aim of the graduation project is to realize a conveyor belt product identification system. With the camera connection to be positioned on the conveyor system, the selected products should be identified as product types and numbers. After this process, the conveyor belt should continue to move forward and the product type and number information should be sent to the phone.
 
-![Conveyor Belt Image](conveyor_belt.png)
+<p align="center">
+  <img src="conveyor_belt.png" />
+</p>
 
 ### Flowchart
 
