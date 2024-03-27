@@ -1,8 +1,9 @@
 # ELE495
 ## ELE495 Final Project Repo
 
+## Kıvanç Kaan Bozkurt, Ahmet Kutay Akpınar, Aylin Oylan, Emre Barış
+
 ### Introduction
-### Kıvanç Kaan Bozkurt, Ahmet Kutay Akpınar, Aylin Oylan, Emre Barış
 
 The aim of the graduation project is to realize a conveyor belt product identification system. With the camera connection to be positioned on the conveyor system, the selected products should be identified as product types and numbers. After this process, the conveyor belt should continue to move forward and the product type and number information should be sent to the phone.
 
