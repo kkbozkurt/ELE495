@@ -1,7 +1,7 @@
 # ELE495
 ## ELE495 Final Project Repo
 
-## Kıvanç Kaan Bozkurt, Ahmet Kutay Akpınar, Aylin Oylan, Emre Barış
+### Kıvanç Kaan Bozkurt, Ahmet Kutay Akpınar, Aylin Oylan, Emre Barış
 
 ### Introduction
 
